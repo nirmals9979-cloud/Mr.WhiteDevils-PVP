@@ -49,7 +49,6 @@ public final class FabricClientAccess implements ClientAccess {
         EntityHitResult hit = entityHit();
         if (inGame() && hit != null && hit.getEntity() instanceof LivingEntity) {
             mc.gameMode.attack(p(), hit.getEntity());
-            p().swing(InteractionHand.MAIN_HAND);
         }
     }
 
