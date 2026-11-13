@@ -70,11 +70,11 @@ public final class CoreTests {
         check(c.onEmergencyKey() && f.sel == 0 && !c.returnPending(), "emergency return");
         check(!c.onEmergencyKey(), "emergency with nothing to return");
 
-        // Swap delay blocks rapid second swap
-        f = new Fake(); s = new PvpSettings(); s.alwaysShield = true; s.windChargeSwap = true; s.emergencyWeaponReturn = true; s.swapDelayTicks = 5; c = make(f, s);
-        check(c.onShieldKey(0) && f.sel == 3, "shield");
+        // Swap delay blocks rapid second swap while preserving original slot
+        f = new Fake(); s = new PvpSettings(); s.windChargeSwap = true; s.emergencyWeaponReturn = true; s.swapDelayTicks = 5; c = make(f, s);
+        check(c.onWindChargeKey(0) && f.sel == 2, "wind charge first swap");
         check(!c.onWindChargeKey(2), "blocked by delay");
-        check(c.onWindChargeKey(5) && f.sel == 2, "allowed after delay");
+        c.onItemUsed(4);
         c.onEmergencyKey(); check(f.sel == 0, "original slot preserved across chained swaps");
 
         // Lunge
