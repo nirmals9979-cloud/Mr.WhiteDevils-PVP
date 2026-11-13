@@ -29,10 +29,12 @@ public final class MrWhiteDevilsPvPClient implements ClientModInitializer {
         controller = new PvpController(new FabricClientAccess(), settings);
 
         KeyMapping.Category cat = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("mrwhitedevilspvp", "main"));
-        KeyMapping menu   = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.mrwhitedevilspvp.menu", InputConstants.Type.KEYSYM, InputConstants.KEY_RSHIFT, cat));
-        KeyMapping wind   = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.mrwhitedevilspvp.windcharge", InputConstants.Type.KEYSYM, InputConstants.KEY_G, cat));
-        KeyMapping shield = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.mrwhitedevilspvp.shield", InputConstants.Type.KEYSYM, InputConstants.KEY_H, cat));
-        KeyMapping emerg  = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.mrwhitedevilspvp.emergency", InputConstants.Type.KEYSYM, InputConstants.KEY_R, cat));
+
+KeyMapping menu = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.mrwhitedevilspvp.menu", InputConstants.Type.KEYBOARD, InputConstants.KEY_RSHIFT, cat));
+KeyMapping wind = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.mrwhitedevilspvp.windcharge", InputConstants.Type.KEYBOARD, InputConstants.KEY_G, cat));
+KeyMapping shield = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.mrwhitedevilspvp.shield", InputConstants.Type.KEYBOARD, InputConstants.KEY_H, cat));
+KeyMapping emerg = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.mrwhitedevilspvp.emergency", InputConstants.Type.KEYBOARD, InputConstants.KEY_R, cat));
+
 
         ClientTickEvents.END_CLIENT_TICK.register(mc -> {
             tick++;
