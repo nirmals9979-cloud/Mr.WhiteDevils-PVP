@@ -52,6 +52,7 @@ public final class PvpController {
         if (!stunSlam.onAttackAttempt(tick)) return false;
         notifications.show("Auto Stun Slam: mace selected");
         stunAttackDueTick = tick + 1;
+        scheduleReturn(tick);
         return true;
     }
 
@@ -63,7 +64,11 @@ public final class PvpController {
     }
 
     public void onItemUsed(long tick) {
-        if (awaitingUse) { awaitingUse = false; scheduleReturn(tick); }
+        if (awaitingUse) {
+            awaitingUse = false;
+            returnDueTick = -1;
+            if (autoReturn.enabled() && swaps.emergencyReturn(client)) notifications.show("Returned to previous weapon");
+        }
     }
 
     public boolean onLungeWindow(long tick) {
@@ -112,7 +117,6 @@ public final class PvpController {
 
         if (stunAttackDueTick >= 0 && tick >= stunAttackDueTick) {
             client.attackTarget();
-            scheduleReturn(tick);
             stunAttackDueTick = -1;
         }
 
