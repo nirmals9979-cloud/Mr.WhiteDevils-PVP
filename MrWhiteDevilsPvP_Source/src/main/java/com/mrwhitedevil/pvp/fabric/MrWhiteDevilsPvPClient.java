@@ -15,7 +15,6 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionResult;
 
-/** Client entrypoint for Mr.WhiteDevil's PvP. */
 public final class MrWhiteDevilsPvPClient implements ClientModInitializer {
     private static long tick = 0;
     private static PvpSettings settings;
@@ -29,7 +28,7 @@ public final class MrWhiteDevilsPvPClient implements ClientModInitializer {
 
         KeyMapping.Category cat = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("mrwhitedevilspvp", "main"));
         KeyMapping menu = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.mrwhitedevilspvp.menu", InputConstants.Type.KEYBOARD, InputConstants.KEY_RSHIFT, cat));
-        KeyMapping wind = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.mrwhitedevilspvp.windcharge", InputConstants.Type.KEYBOARD, InputConstants.KEY_G, cat));
+        KeyMapping lunge = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.mrwhitedevilspvp.lunge", InputConstants.Type.KEYBOARD, InputConstants.KEY_V, cat));
         KeyMapping stun = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.mrwhitedevilspvp.stunslam", InputConstants.Type.KEYBOARD, InputConstants.KEY_J, cat));
         KeyMapping emerg = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.mrwhitedevilspvp.emergency", InputConstants.Type.KEYBOARD, InputConstants.KEY_R, cat));
 
@@ -37,17 +36,16 @@ public final class MrWhiteDevilsPvPClient implements ClientModInitializer {
             tick++;
             while (menu.consumeClick()) mc.gui.setScreen(new PvpScreen(mc.gui.screen(), settings, MrWhiteDevilsPvPClient::changed));
             if (mc.player == null) return;
-            while (wind.consumeClick()) controller.onWindChargeKey(tick);
+            while (lunge.consumeClick()) controller.onLungeWindow(tick);
             while (stun.consumeClick()) {
                 settings.autoStunSlam = !settings.autoStunSlam;
                 changed();
-                controller.notifications.show("Auto Stun Slam " + (settings.autoStunSlam ? "enabled" : "disabled"));
+                controller.notifications.show("Auto Stun Slam: " + (settings.autoStunSlam ? "ON" : "OFF"));
             }
             while (emerg.consumeClick()) controller.onEmergencyKey();
             controller.tick(tick);
         });
 
-        // Swap to the mace on the qualifying entity-attack callback; vanilla continues the attack.
         AttackEntityCallback.EVENT.register((player, level, hand, entity, hit) -> {
             if (level.isClientSide()) controller.onAttackAttempt(tick);
             return InteractionResult.PASS;
