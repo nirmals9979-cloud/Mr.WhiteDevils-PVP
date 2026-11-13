@@ -13,7 +13,7 @@ public final class AutoLungeSwap extends FeatureToggle {
     private final SwapController swaps;
 
     public AutoLungeSwap(ClientAccess client, SmartWeaponDetection detection, SwapController swaps) {
-        super("auto_lunge_swap", "Auto Lunge Swap", false);
+        super("auto_lunge_swap", "Auto Lunge Swap", true);
         this.client = client; this.detection = detection; this.swaps = swaps;
     }
 
