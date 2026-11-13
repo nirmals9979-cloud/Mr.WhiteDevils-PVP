@@ -3,13 +3,13 @@ package com.mrwhitedevil.pvp.fabric;
 import com.mrwhitedevil.pvp.api.ClientAccess;
 import java.util.ArrayList;
 import java.util.List;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import org.lwjgl.glfw.GLFW;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.EntityHitResult;
@@ -24,8 +24,8 @@ public final class FabricClientAccess implements ClientAccess {
     @Override public boolean playerAttacking() { return mc.options.keyAttack.isDown(); }
     @Override public boolean useKeyDown() { return mc.options.keyUse.isDown(); }
     @Override public boolean lungeChainHeld() {
-        boolean ctrl = InputConstants.isKeyDown(mc.getWindow(), GLFW.GLFW_KEY_LEFT_CONTROL)
-            || InputConstants.isKeyDown(mc.getWindow(), GLFW.GLFW_KEY_RIGHT_CONTROL);
+        boolean ctrl = InputConstants.isKeyDown(mc.getWindow(), 341)
+            || InputConstants.isKeyDown(mc.getWindow(), 345);
         return ctrl && mc.options.keyUp.isDown();
     }
 
