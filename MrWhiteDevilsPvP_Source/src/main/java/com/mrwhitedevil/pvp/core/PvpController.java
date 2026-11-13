@@ -49,7 +49,6 @@ public final class PvpController {
 
     public boolean onAttackAttempt(long tick) {
         if (!stunSlam.onAttackAttempt(tick)) return false;
-        notifications.show("Auto Stun Slam: mace selected");
         stunTargetLatched = true;
         stunAttackDueTick = tick + 1;
         scheduleReturn(tick);
@@ -58,7 +57,6 @@ public final class PvpController {
 
     public boolean onWindChargeKey(long tick) {
         if (!windCharge.selectWindCharge(tick)) return false;
-        notifications.show("Wind Charge Swap: selected Wind Charge");
         awaitingUse = true;
         return true;
     }
@@ -67,14 +65,13 @@ public final class PvpController {
         if (awaitingUse) {
             awaitingUse = false;
             returnDueTick = -1;
-            if (autoReturn.enabled() && swaps.emergencyReturn(client)) notifications.show("Returned to previous weapon");
+            if (autoReturn.enabled()) swaps.emergencyReturn(client);
         }
     }
 
     public boolean onLungeWindow(long tick) {
         if (!lunge.onLungeWindow(tick)) return false;
-        notifications.show("Lunge: spear selected");
-        client.useMainHand();
+        client.attackTarget();
         scheduleReturn(tick);
         return true;
     }
@@ -89,11 +86,10 @@ public final class PvpController {
         int pulses = 0;
         for (int i = 0; i < 5; i++) {
             if (!swaps.swapToImmediate(client, spearSlot.getAsInt(), tick)) break;
-            client.useMainHand();
+            client.attackTarget();
             if (!swaps.emergencyReturn(client)) break;
             pulses++;
         }
-        if (pulses > 0) notifications.show("Lunge chain: " + pulses + " pulses");
         return pulses;
     }
 
@@ -103,7 +99,6 @@ public final class PvpController {
         if (down && !useWasDown && windCharge.enabled() && client.inGame()
                 && client.selectedItemIsSwordOrAxe()) {
             if (windCharge.selectWindCharge(tick)) {
-                notifications.show("Wind Charge Swap: ON");
                 client.useMainHand();
                 scheduleReturn(tick);
             }
@@ -142,7 +137,6 @@ public final class PvpController {
         if (returnDueTick >= 0 && tick >= returnDueTick) {
             if (swaps.originalSlot().isEmpty()) { returnDueTick = -1; return; }
             if (autoReturn.enabled() && swaps.emergencyReturn(client)) {
-                notifications.show("Returned to previous weapon");
                 returnDueTick = -1;
             }
         }
