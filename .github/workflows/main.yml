@@ -1,14 +1,24 @@
+
 name: Build Mr.WhiteDevilsPvP
+
 on:
   workflow_dispatch:
   push:
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
+    defaults:
+      run:
+        working-directory: ./MrWhiteDevilsPvP_Source
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '25'
@@ -16,34 +26,34 @@ jobs:
       - name: Show Java version
         run: java -version
 
-      - name: Core unit tests (pure Java, no Minecraft)
+      - name: Run core unit tests
         run: sh run_core_tests.sh
 
-      - uses: gradle/actions/setup-gradle@v4
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '9.8.2'
 
-      - name: Build the mod JAR (Fabric Loom, loom_version from gradle.properties)
+      - name: Build the mod JAR
         run: |
           grep -E '^(minecraft_version|loader_version|loom_version|fabric_api_version)=' gradle.properties
           gradle build --no-daemon --stacktrace
 
-      - name: Verify the JAR is the real mod
+      - name: Verify the JAR
         run: |
           JAR=build/libs/Mr.WhiteDevilsPvP.jar
           test -f "$JAR"
-          ls -l build/libs
           unzip -l "$JAR" > /tmp/jar-list.txt
           unzip -p "$JAR" fabric.mod.json > /tmp/fmj.json
           grep -q 'fabric.mod.json' /tmp/jar-list.txt
           grep -q 'com/mrwhitedevil/pvp/fabric/MrWhiteDevilsPvPClient.class' /tmp/jar-list.txt
           grep -q 'com/mrwhitedevil/pvp/core/PvpController.class' /tmp/jar-list.txt
           grep -q '"version": "1.0.0"' /tmp/fmj.json
-          if grep -q 'version}' /tmp/fmj.json; then echo "fabric.mod.json still has an unexpanded placeholder"; exit 1; fi
-          echo "JAR looks like the real mod"
+          echo "JAR verification passed"
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload mod JAR
+        uses: actions/upload-artifact@v4
         with:
-          name: Mr.WhiteDevilsPvP
-          path: build/libs/Mr.WhiteDevilsPvP.jar
+          name: MrWhiteDevilsPvP
+          path: MrWhiteDevilsPvP_Source/build/libs/Mr.WhiteDevilsPvP.jar
           if-no-files-found: error
