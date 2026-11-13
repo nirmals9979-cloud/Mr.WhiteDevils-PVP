@@ -7,7 +7,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
-/** Functional settings menu: toggle buttons + delay -/+ . Saves on change. */
+/** Settings menu for the enabled PvP utilities. */
 public final class PvpScreen extends Screen {
     private final Screen parent;
     private final PvpSettings s;
@@ -28,14 +28,13 @@ public final class PvpScreen extends Screen {
 
     @Override protected void init() {
         toggle(0, "Auto Lunge Swap", () -> s.autoLungeSwap, v -> s.autoLungeSwap = v);
-        toggle(1, "Always Shield", () -> s.alwaysShield, v -> s.alwaysShield = v);
-        toggle(2, "Auto Stun Slam", () -> s.autoStunSlam, v -> s.autoStunSlam = v);
-        toggle(3, "Wind Charge Swap", () -> s.windChargeSwap, v -> s.windChargeSwap = v);
-        toggle(4, "Auto Return to Weapon", () -> s.automaticReturn, v -> s.automaticReturn = v);
-        toggle(5, "Emergency Weapon Return", () -> s.emergencyWeaponReturn, v -> s.emergencyWeaponReturn = v);
-        toggle(6, "Action Notifications", () -> s.actionNotifications, v -> s.actionNotifications = v);
+        toggle(1, "Auto Stun Slam (J)", () -> s.autoStunSlam, v -> s.autoStunSlam = v);
+        toggle(2, "Wind Charge Swap", () -> s.windChargeSwap, v -> s.windChargeSwap = v);
+        toggle(3, "Auto Return to Weapon", () -> s.automaticReturn, v -> s.automaticReturn = v);
+        toggle(4, "Emergency Weapon Return", () -> s.emergencyWeaponReturn, v -> s.emergencyWeaponReturn = v);
+        toggle(5, "Action Notifications", () -> s.actionNotifications, v -> s.actionNotifications = v);
 
-        int y = 30 + 7 * 24, cx = this.width / 2;
+        int y = 30 + 6 * 24, cx = this.width / 2;
         Button delay = Button.builder(delayText(), b -> {}).bounds(cx - 70, y, 140, 20).build();
         delay.active = false;
         addRenderableWidget(Button.builder(Component.literal("-"), b -> { s.swapDelayTicks = Math.max(0, s.swapDelayTicks - 1); delay.setMessage(delayText()); onChange.run(); })
