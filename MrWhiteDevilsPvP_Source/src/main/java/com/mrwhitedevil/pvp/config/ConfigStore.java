@@ -12,7 +12,6 @@ public final class ConfigStore {
         Properties p = new Properties();
         p.setProperty("swapDelayTicks", Integer.toString(s.swapDelayTicks));
         p.setProperty("autoLungeSwap", Boolean.toString(s.autoLungeSwap));
-        p.setProperty("alwaysShield", Boolean.toString(s.alwaysShield));
         p.setProperty("autoStunSlam", Boolean.toString(s.autoStunSlam));
         p.setProperty("windChargeSwap", Boolean.toString(s.windChargeSwap));
         p.setProperty("automaticReturn", Boolean.toString(s.automaticReturn));
@@ -30,7 +29,6 @@ public final class ConfigStore {
         try { s.swapDelayTicks = Math.max(0, Math.min(40, Integer.parseInt(p.getProperty("swapDelayTicks", "2")))); }
         catch (NumberFormatException ignored) {}
         s.autoLungeSwap = b(p, "autoLungeSwap", s.autoLungeSwap);
-        s.alwaysShield = b(p, "alwaysShield", s.alwaysShield);
         s.autoStunSlam = b(p, "autoStunSlam", s.autoStunSlam);
         s.windChargeSwap = b(p, "windChargeSwap", s.windChargeSwap);
         s.automaticReturn = b(p, "automaticReturn", s.automaticReturn);
