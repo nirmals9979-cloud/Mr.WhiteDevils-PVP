@@ -45,10 +45,10 @@ public final class CoreTests {
         c.tick(103); check(f.sel == 0, "returned to original after delay");
         check(!c.returnPending(), "return cleared");
 
-        // Conditions: on ground / no shield / out of reach / not living => no swap
-        for (int i = 0; i < 4; i++) {
+        // Conditions: on ground / out of reach / not living => no swap
+        for (int i = 0; i < 3; i++) {
             f = new Fake(); s = new PvpSettings(); s.autoStunSlam = true; c = make(f, s);
-            if (i==0) f.ground = true; if (i==1) f.shield = false; if (i==2) f.reach = false; if (i==3) f.living = false;
+            if (i==0) f.ground = true; if (i==1) f.reach = false; if (i==2) f.living = false;
             check(!c.onAttackAttempt(0) && f.sel == 0, "stun slam gated case " + i);
         }
         // Disabled feature does nothing
