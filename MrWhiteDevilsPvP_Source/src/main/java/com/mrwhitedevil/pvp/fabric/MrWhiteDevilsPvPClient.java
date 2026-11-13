@@ -8,12 +8,9 @@ import java.nio.file.Path;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
-import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
-import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.InteractionResult;
 
 public final class MrWhiteDevilsPvPClient implements ClientModInitializer {
     private static long tick = 0;
@@ -44,15 +41,6 @@ public final class MrWhiteDevilsPvPClient implements ClientModInitializer {
             }
             while (emerg.consumeClick()) controller.onEmergencyKey();
             controller.tick(tick);
-        });
-
-        AttackEntityCallback.EVENT.register((player, level, hand, entity, hit) -> {
-            if (level.isClientSide()) controller.onAttackAttempt(tick);
-            return InteractionResult.PASS;
-        });
-        UseItemCallback.EVENT.register((player, level, hand) -> {
-            if (level.isClientSide()) controller.onItemUsed(tick);
-            return InteractionResult.PASS;
         });
     }
 
