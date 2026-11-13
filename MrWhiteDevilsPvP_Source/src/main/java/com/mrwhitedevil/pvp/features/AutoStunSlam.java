@@ -6,10 +6,7 @@ import com.mrwhitedevil.pvp.core.FeatureToggle;
 import com.mrwhitedevil.pvp.core.SwapController;
 import java.util.OptionalInt;
 
-/**
- * Client-side combo coordinator. Does not apply server-side stun effects.
- * Adapter calls onAttackAttempt() from the verified attack input/event hook.
- */
+/** Selects a mace for an airborne crosshair target. The server controls actual hit/stun results. */
 public final class AutoStunSlam extends FeatureToggle {
     private final ClientAccess client;
     private final SmartWeaponDetection detection;
@@ -22,15 +19,11 @@ public final class AutoStunSlam extends FeatureToggle {
 
     public boolean onAttackAttempt(long tick) {
         if (!enabled() || !client.inGame() || client.playerOnGround()
-                || !client.targetIsLivingEntity() || !client.targetHasShieldRaised()
-                || !client.targetIsInReach()) return false;
-
+                || !client.targetIsLivingEntity() || !client.targetIsInReach()) return false;
         OptionalInt mace = detection.find(ItemClassifier.Kind.MACE);
-        if (mace.isEmpty()) return false;
-        return swaps.swapTo(client, mace.getAsInt(), tick);
+        return mace.isPresent() && swaps.swapTo(client, mace.getAsInt(), tick);
     }
 
-    /** Called by adapter after the combo's legitimate attack action has completed. */
     public boolean finishSequence(long tick) {
         return swaps.returnToOriginal(client, tick);
     }
