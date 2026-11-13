@@ -122,7 +122,7 @@ public final class PvpController {
 
         if (returnDueTick >= 0 && tick >= returnDueTick) {
             if (swaps.originalSlot().isEmpty()) { returnDueTick = -1; return; }
-            if (autoReturn.afterAction(tick)) {
+            if (autoReturn.enabled() && swaps.emergencyReturn(client)) {
                 notifications.show("Returned to previous weapon");
                 returnDueTick = -1;
             }
