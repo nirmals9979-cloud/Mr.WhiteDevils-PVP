@@ -1,0 +1,58 @@
+package com.mrwhitedevil.pvp.fabric;
+
+import com.mrwhitedevil.pvp.api.ClientAccess;
+import java.util.ArrayList;
+import java.util.List;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+
+/**
+ * Mojang names. Calls checked against public 26.x sources; NOT compiled against the 26.3 jar - see BUILD_AND_REPORT.md.
+ * Uses only normal client paths (inventory slot select, gameMode.useItem, action-bar message).
+ */
+public final class FabricClientAccess implements ClientAccess {
+    private final Minecraft mc = Minecraft.getInstance();
+
+    private LocalPlayer p() { return mc.player; }
+
+    @Override public boolean inGame() { return mc.player != null && mc.level != null && mc.gameMode != null; }
+    @Override public boolean playerOnGround() { return p() != null && p().onGround(); }
+    @Override public boolean playerAttacking() { return mc.options.keyAttack.isDown(); }
+
+    private EntityHitResult entityHit() {
+        HitResult h = mc.hitResult;
+        return h instanceof EntityHitResult e ? e : null;
+    }
+    @Override public boolean targetIsLivingEntity() { EntityHitResult e = entityHit(); return e != null && e.getEntity() instanceof LivingEntity; }
+    @Override public boolean targetHasShieldRaised() {
+        EntityHitResult e = entityHit();
+        return e != null && e.getEntity() instanceof LivingEntity le && le.isBlocking();
+    }
+    /** mc.hitResult is already computed against the player's entity interaction range. */
+    @Override public boolean targetIsInReach() { return entityHit() != null; }
+
+    @Override public int selectedHotbarSlot() { return p().getInventory().getSelectedSlot(); }
+    @Override public void selectHotbarSlot(int slot) { p().getInventory().setSelectedSlot(slot); }
+
+    @Override public List<HotbarStack> hotbar() {
+        List<HotbarStack> out = new ArrayList<>(9);
+        for (int i = 0; i < 9; i++) {
+            ItemStack s = p().getInventory().getItem(i);
+            String id = s.isEmpty() ? "" : BuiltInRegistries.ITEM.getKey(s.getItem()).toString();
+            out.add(new HotbarStack(i, id, s.getCount(), s.isEmpty()));
+        }
+        return out;
+    }
+
+    @Override public void useMainHand() { mc.gameMode.useItem(p(), InteractionHand.MAIN_HAND); }
+    @Override public void notifyAction(String message) {
+        if (p() != null) p().sendOverlayMessage(Component.literal("[PvP] " + message));
+    }
+}

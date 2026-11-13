@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "id": "mrwhitedevilspvp",
+  "version": "${version}",
+  "name": "Mr.WhiteDevil's PvP",
+  "description": "Client-side PvP hotbar utilities.",
+  "environment": "client",
+  "entrypoints": { "client": ["com.mrwhitedevil.pvp.fabric.MrWhiteDevilsPvPClient"] },
+  "depends": { "fabricloader": ">=0.19.5", "minecraft": "~26.3", "java": ">=25", "fabric-api": "*" }
+}

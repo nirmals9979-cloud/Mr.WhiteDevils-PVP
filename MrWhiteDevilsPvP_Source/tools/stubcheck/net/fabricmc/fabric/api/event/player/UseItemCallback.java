@@ -1,0 +1,2 @@
+package net.fabricmc.fabric.api.event.player; import net.fabricmc.fabric.api.event.Event; import net.minecraft.world.entity.player.Player; import net.minecraft.world.level.Level; import net.minecraft.world.InteractionHand; import net.minecraft.world.InteractionResult;
+public interface UseItemCallback { Event<UseItemCallback> EVENT = new Event<>(); InteractionResult interact(Player p, Level l, InteractionHand h); }

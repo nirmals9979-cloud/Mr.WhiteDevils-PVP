@@ -1,0 +1,2 @@
+package net.minecraft.client; import net.minecraft.client.player.LocalPlayer; import net.minecraft.client.multiplayer.*; import net.minecraft.client.gui.Gui; import net.minecraft.world.phys.HitResult;
+public class Minecraft { public static Minecraft getInstance(){return null;} public LocalPlayer player; public ClientLevel level; public MultiPlayerGameMode gameMode; public HitResult hitResult; public Options options; public Gui gui; }

@@ -1,0 +1,1 @@
+package net.minecraft.world.entity.player; import net.minecraft.world.item.ItemStack; public class Inventory { public int getSelectedSlot(){return 0;} public void setSelectedSlot(int i){} public ItemStack getItem(int i){return null;} }

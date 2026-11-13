@@ -1,0 +1,4 @@
+Loom needs Gradle 9.2+. From this folder (with any Gradle 9.x installed):
+    gradle wrapper --gradle-version 9.8.2
+then:   ./gradlew build        (JDK 25 required)
+Result: build/libs/Mr.WhiteDevilsPvP.jar
