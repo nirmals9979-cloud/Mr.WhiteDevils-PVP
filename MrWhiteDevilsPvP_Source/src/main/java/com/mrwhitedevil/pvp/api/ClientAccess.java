@@ -14,8 +14,8 @@ public interface ClientAccess {
     void selectHotbarSlot(int slot);
     List<HotbarStack> hotbar();
     void useMainHand();
-    void attackTarget();
-    boolean useKeyDown();
+    default void attackTarget() {}
+    default boolean useKeyDown() { return false; }
     void notifyAction(String message);
 
     default boolean selectedItemIsSwordOrAxe() {
