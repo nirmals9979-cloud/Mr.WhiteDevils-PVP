@@ -30,6 +30,16 @@ public final class SwapController {
         return true;
     }
 
+    /** Immediate swap used only by the held Lunge chain; bypasses configured delay. */
+    public boolean swapToImmediate(ClientAccess client, int slot, long tick) {
+        if (!client.inGame() || slot < 0 || slot > 8) return false;
+        if (originalSlot < 0) originalSlot = client.selectedHotbarSlot();
+        client.selectHotbarSlot(slot);
+        lastSelectedSlot = slot;
+        lastSwapTick = tick;
+        return true;
+    }
+
     public boolean returnToOriginal(ClientAccess client, long tick) {
         if (!client.inGame() || originalSlot < 0 || !canSwap(tick)) return false;
         client.selectHotbarSlot(originalSlot);
