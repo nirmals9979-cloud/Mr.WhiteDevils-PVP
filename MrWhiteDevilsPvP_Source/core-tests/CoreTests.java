@@ -13,7 +13,7 @@ public final class CoreTests {
 
     static final class Fake implements ClientAccess {
         boolean ground = false, living = true, shield = true, reach = true;
-        int sel = 0; List<String> msgs = new ArrayList<>();
+        int sel = 0, uses = 0; boolean chainHeld = false; List<String> msgs = new ArrayList<>();
         String[] items = {"minecraft:diamond_sword","minecraft:mace","minecraft:wind_charge",
             "minecraft:shield","minecraft:iron_spear","","","",""};
         public boolean inGame() { return true; }
@@ -29,7 +29,8 @@ public final class CoreTests {
             for (int i = 0; i < 9; i++) l.add(new HotbarStack(i, items[i], items[i].isEmpty()?0:1, items[i].isEmpty()));
             return l;
         }
-        public void useMainHand() {}
+        public void useMainHand() { uses++; }
+        public boolean lungeChainHeld() { return chainHeld; }
         public void notifyAction(String m) { msgs.add(m); }
     }
 
@@ -78,8 +79,10 @@ public final class CoreTests {
         c.onEmergencyKey(); check(f.sel == 0, "original slot preserved across chained swaps");
 
         // Lunge
-        f = new Fake(); s = new PvpSettings(); s.autoLungeSwap = true; c = make(f, s);
-        check(c.onLungeWindow(0) && f.sel == 4, "lunge -> spear");
+        f = new Fake(); s = new PvpSettings(); c = make(f, s);
+        check(c.onLungeWindow(0) && f.sel == 4 && f.uses == 1, "V lunge selects spear and uses it");
+        f = new Fake(); f.chainHeld = true; s = new PvpSettings(); c = make(f, s);
+        check(c.onLungeChainTick(1) == 5 && f.uses == 5 && f.sel == 0, "Ctrl+W+V performs five spear pulses and restores slot");
 
         // Missing items
         f = new Fake(); f.items[1] = ""; s = new PvpSettings(); s.autoStunSlam = true; c = make(f, s);
