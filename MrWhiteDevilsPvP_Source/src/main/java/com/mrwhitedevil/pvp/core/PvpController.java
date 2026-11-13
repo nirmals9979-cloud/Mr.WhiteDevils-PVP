@@ -40,7 +40,6 @@ public final class PvpController {
 
     public void applySettings() {
         delay.setDelayTicks(settings.swapDelayTicks);
-        lunge.setEnabled(settings.autoLungeSwap);
         stunSlam.setEnabled(settings.autoStunSlam);
         windCharge.setEnabled(settings.windChargeSwap);
         autoReturn.setEnabled(settings.automaticReturn);
@@ -74,7 +73,8 @@ public final class PvpController {
 
     public boolean onLungeWindow(long tick) {
         if (!lunge.onLungeWindow(tick)) return false;
-        notifications.show("Auto Lunge Swap: spear selected");
+        notifications.show("Lunge: spear selected");
+        client.useMainHand();
         scheduleReturn(tick);
         return true;
     }
