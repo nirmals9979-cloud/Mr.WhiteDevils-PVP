@@ -12,11 +12,10 @@ import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionResult;
 
-/** Client entrypoint (26.x: KeyMappingHelper, gui.setScreen). Not yet compiled against the 26.3 jar. */
+/** Client entrypoint for Mr.WhiteDevil's PvP. */
 public final class MrWhiteDevilsPvPClient implements ClientModInitializer {
     private static long tick = 0;
     private static PvpSettings settings;
@@ -29,24 +28,26 @@ public final class MrWhiteDevilsPvPClient implements ClientModInitializer {
         controller = new PvpController(new FabricClientAccess(), settings);
 
         KeyMapping.Category cat = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("mrwhitedevilspvp", "main"));
-
-KeyMapping menu = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.mrwhitedevilspvp.menu", InputConstants.Type.KEYBOARD, InputConstants.KEY_RSHIFT, cat));
-KeyMapping wind = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.mrwhitedevilspvp.windcharge", InputConstants.Type.KEYBOARD, InputConstants.KEY_G, cat));
-KeyMapping shield = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.mrwhitedevilspvp.shield", InputConstants.Type.KEYBOARD, InputConstants.KEY_H, cat));
-KeyMapping emerg = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.mrwhitedevilspvp.emergency", InputConstants.Type.KEYBOARD, InputConstants.KEY_R, cat));
-
+        KeyMapping menu = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.mrwhitedevilspvp.menu", InputConstants.Type.KEYBOARD, InputConstants.KEY_RSHIFT, cat));
+        KeyMapping wind = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.mrwhitedevilspvp.windcharge", InputConstants.Type.KEYBOARD, InputConstants.KEY_G, cat));
+        KeyMapping stun = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.mrwhitedevilspvp.stunslam", InputConstants.Type.KEYBOARD, InputConstants.KEY_J, cat));
+        KeyMapping emerg = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.mrwhitedevilspvp.emergency", InputConstants.Type.KEYBOARD, InputConstants.KEY_R, cat));
 
         ClientTickEvents.END_CLIENT_TICK.register(mc -> {
             tick++;
             while (menu.consumeClick()) mc.gui.setScreen(new PvpScreen(mc.gui.screen(), settings, MrWhiteDevilsPvPClient::changed));
             if (mc.player == null) return;
             while (wind.consumeClick()) controller.onWindChargeKey(tick);
-            while (shield.consumeClick()) controller.onShieldKey(tick);
+            while (stun.consumeClick()) {
+                settings.autoStunSlam = !settings.autoStunSlam;
+                changed();
+                controller.notifications.show("Auto Stun Slam " + (settings.autoStunSlam ? "enabled" : "disabled"));
+            }
             while (emerg.consumeClick()) controller.onEmergencyKey();
             controller.tick(tick);
         });
 
-        // Player's own attack: swap happens before the attack is sent (vanilla syncs the held slot in attack()).
+        // Swap to the mace on the qualifying entity-attack callback; vanilla continues the attack.
         AttackEntityCallback.EVENT.register((player, level, hand, entity, hit) -> {
             if (level.isClientSide()) controller.onAttackAttempt(tick);
             return InteractionResult.PASS;
