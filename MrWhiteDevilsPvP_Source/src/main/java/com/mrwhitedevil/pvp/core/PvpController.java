@@ -22,6 +22,7 @@ public final class PvpController {
     private long stunAttackDueTick = -1;
     private boolean stunTargetLatched = false;
     private boolean useWasDown = false;
+    private boolean awaitingUse = false;
 
     public PvpController(ClientAccess client, PvpSettings settings) {
         this.client = client;
@@ -54,6 +55,17 @@ public final class PvpController {
         return true;
     }
 
+    public boolean onWindChargeKey(long tick) {
+        if (!windCharge.selectWindCharge(tick)) return false;
+        notifications.show("Wind Charge Swap: selected Wind Charge");
+        awaitingUse = true;
+        return true;
+    }
+
+    public void onItemUsed(long tick) {
+        if (awaitingUse) { awaitingUse = false; scheduleReturn(tick); }
+    }
+
     public boolean onLungeWindow(long tick) {
         if (!lunge.onLungeWindow(tick)) return false;
         notifications.show("Auto Lunge Swap: spear selected");
@@ -79,6 +91,7 @@ public final class PvpController {
         returnDueTick = -1;
         stunAttackDueTick = -1;
         stunTargetLatched = false;
+        awaitingUse = false;
         return emergency.trigger();
     }
 
