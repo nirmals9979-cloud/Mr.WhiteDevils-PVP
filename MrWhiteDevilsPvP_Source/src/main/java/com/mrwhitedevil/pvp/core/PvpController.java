@@ -4,7 +4,7 @@ import com.mrwhitedevil.pvp.api.ClientAccess;
 import com.mrwhitedevil.pvp.config.PvpSettings;
 import com.mrwhitedevil.pvp.features.*;
 
-/** Coordinates feature logic, hotbar swaps and delayed returns. */
+/** Coordinates hotbar swaps and client-side feature actions. */
 public final class PvpController {
     public final PvpSettings settings;
     public final SwapController swaps = new SwapController();
@@ -19,7 +19,9 @@ public final class PvpController {
     private final ClientAccess client;
 
     private long returnDueTick = -1;
-    private boolean awaitingUse = false;
+    private long stunAttackDueTick = -1;
+    private boolean stunTargetLatched = false;
+    private boolean useWasDown = false;
 
     public PvpController(ClientAccess client, PvpSettings settings) {
         this.client = client;
@@ -45,45 +47,62 @@ public final class PvpController {
         notifications.setEnabled(settings.actionNotifications);
     }
 
-    /** Swaps to the mace for a qualifying airborne attack against a blocking target. */
     public boolean onAttackAttempt(long tick) {
         if (!stunSlam.onAttackAttempt(tick)) return false;
-        notifications.show("Auto Stun Slam: swapped to Mace");
-        scheduleReturn(tick);
+        notifications.show("Auto Stun Slam: mace selected");
+        stunAttackDueTick = tick + 1;
         return true;
     }
 
-    /** Called by a real adapter trigger when a Lunge action window is confirmed. */
     public boolean onLungeWindow(long tick) {
         if (!lunge.onLungeWindow(tick)) return false;
-        notifications.show("Auto Lunge Swap: swapped to Spear");
+        notifications.show("Auto Lunge Swap: spear selected");
         scheduleReturn(tick);
         return true;
     }
 
-    public boolean onWindChargeKey(long tick) {
-        if (!windCharge.selectWindCharge(tick)) return false;
-        notifications.show("Wind Charge Swap: selected Wind Charge");
-        awaitingUse = true;
-        return true;
-    }
-
-    public void onItemUsed(long tick) {
-        if (awaitingUse) { awaitingUse = false; scheduleReturn(tick); }
+    /** Detects a right-click edge while a sword/axe is held, then uses the hotbar wind charge. */
+    private void handleWindChargeInput(long tick) {
+        boolean down = client.useKeyDown();
+        if (down && !useWasDown && windCharge.enabled() && client.inGame()
+                && client.selectedItemIsSwordOrAxe()) {
+            if (windCharge.selectWindCharge(tick)) {
+                notifications.show("Wind Charge Swap: ON");
+                client.useMainHand();
+                scheduleReturn(tick);
+            }
+        }
+        useWasDown = down;
     }
 
     public boolean onEmergencyKey() {
         returnDueTick = -1;
-        awaitingUse = false;
+        stunAttackDueTick = -1;
+        stunTargetLatched = false;
         return emergency.trigger();
     }
 
     private void scheduleReturn(long tick) {
-        if (autoReturn.enabled()) returnDueTick = tick + swaps.delayTicks();
+        if (autoReturn.enabled()) returnDueTick = tick + Math.max(1, swaps.delayTicks());
     }
 
     public void tick(long tick) {
         for (Feature f : new Feature[]{lunge, stunSlam, windCharge, autoReturn, emergency, delay, notifications}) f.tick();
+
+        handleWindChargeInput(tick);
+
+        if (!client.targetIsLivingEntity() || !client.targetIsInReach()) stunTargetLatched = false;
+        if (stunSlam.enabled() && !stunTargetLatched && client.inGame()
+                && !client.playerOnGround() && client.targetIsLivingEntity() && client.targetIsInReach()) {
+            if (onAttackAttempt(tick)) stunTargetLatched = true;
+        }
+
+        if (stunAttackDueTick >= 0 && tick >= stunAttackDueTick) {
+            client.attackTarget();
+            scheduleReturn(tick);
+            stunAttackDueTick = -1;
+        }
+
         if (returnDueTick >= 0 && tick >= returnDueTick) {
             if (swaps.originalSlot().isEmpty()) { returnDueTick = -1; return; }
             if (autoReturn.afterAction(tick)) {
