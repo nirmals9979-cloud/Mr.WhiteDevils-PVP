@@ -1,5 +1,5 @@
 
-name: Build Mr.WhiteDevilsPvP
+name: Build MrWhiteDevilsPvP
 
 on:
   workflow_dispatch:
@@ -11,7 +11,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: ./MrWhiteDevilsPvP_Source
+        working-directory: MrWhiteDevilsPvP_Source
 
     steps:
       - name: Checkout repository
@@ -34,7 +34,7 @@ jobs:
         with:
           gradle-version: '9.8.2'
 
-      - name: Build the mod JAR
+      - name: Build the mod
         run: |
           grep -E '^(minecraft_version|loader_version|loom_version|fabric_api_version)=' gradle.properties
           gradle build --no-daemon --stacktrace
