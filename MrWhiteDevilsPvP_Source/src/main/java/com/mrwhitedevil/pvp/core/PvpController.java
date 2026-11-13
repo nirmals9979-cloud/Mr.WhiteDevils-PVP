@@ -79,6 +79,24 @@ public final class PvpController {
         return true;
     }
 
+    public boolean lungeChainHeld() { return client.lungeChainHeld(); }
+
+    /** Executes five immediate spear-use/return pulses per client tick while Ctrl+W+V is held. */
+    public int onLungeChainTick(long tick) {
+        if (!client.inGame() || !client.lungeChainHeld()) return 0;
+        java.util.OptionalInt spearSlot = detection.find(com.mrwhitedevil.pvp.api.ItemClassifier.Kind.SPEAR);
+        if (spearSlot.isEmpty()) return 0;
+        int pulses = 0;
+        for (int i = 0; i < 5; i++) {
+            if (!swaps.swapToImmediate(client, spearSlot.getAsInt(), tick)) break;
+            client.useMainHand();
+            if (!swaps.emergencyReturn(client)) break;
+            pulses++;
+        }
+        if (pulses > 0) notifications.show("Lunge chain: " + pulses + " pulses");
+        return pulses;
+    }
+
     /** Detects a right-click edge while a sword/axe is held, then uses the hotbar wind charge. */
     private void handleWindChargeInput(long tick) {
         boolean down = client.useKeyDown();
