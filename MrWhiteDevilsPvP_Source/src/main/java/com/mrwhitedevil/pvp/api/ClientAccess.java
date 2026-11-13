@@ -16,6 +16,7 @@ public interface ClientAccess {
     void useMainHand();
     default void attackTarget() {}
     default boolean useKeyDown() { return false; }
+    default boolean lungeChainHeld() { return false; }
     void notifyAction(String message);
 
     default boolean selectedItemIsSwordOrAxe() {
