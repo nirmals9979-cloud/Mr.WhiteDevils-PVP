@@ -9,6 +9,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
+import org.lwjgl.glfw.GLFW;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.EntityHitResult;
@@ -22,6 +23,11 @@ public final class FabricClientAccess implements ClientAccess {
     @Override public boolean playerOnGround() { return p() != null && p().onGround(); }
     @Override public boolean playerAttacking() { return mc.options.keyAttack.isDown(); }
     @Override public boolean useKeyDown() { return mc.options.keyUse.isDown(); }
+    @Override public boolean lungeChainHeld() {
+        boolean ctrl = InputConstants.isKeyDown(mc.getWindow(), GLFW.GLFW_KEY_LEFT_CONTROL)
+            || InputConstants.isKeyDown(mc.getWindow(), GLFW.GLFW_KEY_RIGHT_CONTROL);
+        return ctrl && mc.options.keyUp.isDown();
+    }
 
     private EntityHitResult entityHit() {
         HitResult h = mc.hitResult;
