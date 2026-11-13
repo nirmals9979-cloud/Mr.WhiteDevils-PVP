@@ -51,6 +51,7 @@ public final class PvpController {
     public boolean onAttackAttempt(long tick) {
         if (!stunSlam.onAttackAttempt(tick)) return false;
         notifications.show("Auto Stun Slam: mace selected");
+        stunTargetLatched = true;
         stunAttackDueTick = tick + 1;
         scheduleReturn(tick);
         return true;
