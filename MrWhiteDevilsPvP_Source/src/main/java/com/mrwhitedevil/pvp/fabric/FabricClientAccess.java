@@ -21,6 +21,7 @@ public final class FabricClientAccess implements ClientAccess {
     @Override public boolean inGame() { return mc.player != null && mc.level != null && mc.gameMode != null; }
     @Override public boolean playerOnGround() { return p() != null && p().onGround(); }
     @Override public boolean playerAttacking() { return mc.options.keyAttack.isDown(); }
+    @Override public boolean useKeyDown() { return mc.options.keyUse.isDown(); }
 
     private EntityHitResult entityHit() {
         HitResult h = mc.hitResult;
@@ -42,7 +43,16 @@ public final class FabricClientAccess implements ClientAccess {
         return out;
     }
 
-    @Override public void useMainHand() { mc.gameMode.useItem(p(), InteractionHand.MAIN_HAND); }
+    @Override public void useMainHand() { if (inGame()) mc.gameMode.useItem(p(), InteractionHand.MAIN_HAND); }
+
+    @Override public void attackTarget() {
+        EntityHitResult hit = entityHit();
+        if (inGame() && hit != null && hit.getEntity() instanceof LivingEntity) {
+            mc.gameMode.attack(p(), hit.getEntity());
+            p().swing(InteractionHand.MAIN_HAND);
+        }
+    }
+
     @Override public void notifyAction(String message) {
         if (p() == null) return;
         ChatFormatting color = message.endsWith(": ON") ? ChatFormatting.GREEN
