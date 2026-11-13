@@ -33,7 +33,12 @@ public final class MrWhiteDevilsPvPClient implements ClientModInitializer {
             tick++;
             while (menu.consumeClick()) mc.gui.setScreen(new PvpScreen(mc.gui.screen(), settings, MrWhiteDevilsPvPClient::changed));
             if (mc.player == null) return;
-            while (lunge.consumeClick()) controller.onLungeWindow(tick);
+            if (lunge.isDown() && controller.lungeChainHeld()) {
+                while (lunge.consumeClick()) { /* consume the initial press; chain owns this hold */ }
+                controller.onLungeChainTick(tick);
+            } else {
+                while (lunge.consumeClick()) controller.onLungeWindow(tick);
+            }
             while (stun.consumeClick()) {
                 settings.autoStunSlam = !settings.autoStunSlam;
                 changed();
