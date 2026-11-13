@@ -24,8 +24,8 @@ public final class FabricClientAccess implements ClientAccess {
     @Override public boolean playerAttacking() { return mc.options.keyAttack.isDown(); }
     @Override public boolean useKeyDown() { return mc.options.keyUse.isDown(); }
     @Override public boolean lungeChainHeld() {
-        boolean ctrl = InputConstants.isKeyDown(mc.getWindow(), 341)
-            || InputConstants.isKeyDown(mc.getWindow(), 345);
+        boolean ctrl = InputConstants.isKeyDown(341)
+            || InputConstants.isKeyDown(345);
         return ctrl && mc.options.keyUp.isDown();
     }
 
