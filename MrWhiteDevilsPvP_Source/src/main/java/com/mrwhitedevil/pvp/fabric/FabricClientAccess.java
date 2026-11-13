@@ -6,6 +6,7 @@ import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
@@ -13,13 +14,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 
-/**
- * Mojang names. Calls checked against public 26.x sources; NOT compiled against the 26.3 jar - see BUILD_AND_REPORT.md.
- * Uses only normal client paths (inventory slot select, gameMode.useItem, action-bar message).
- */
 public final class FabricClientAccess implements ClientAccess {
     private final Minecraft mc = Minecraft.getInstance();
-
     private LocalPlayer p() { return mc.player; }
 
     @Override public boolean inGame() { return mc.player != null && mc.level != null && mc.gameMode != null; }
@@ -31,13 +27,8 @@ public final class FabricClientAccess implements ClientAccess {
         return h instanceof EntityHitResult e ? e : null;
     }
     @Override public boolean targetIsLivingEntity() { EntityHitResult e = entityHit(); return e != null && e.getEntity() instanceof LivingEntity; }
-    @Override public boolean targetHasShieldRaised() {
-        EntityHitResult e = entityHit();
-        return e != null && e.getEntity() instanceof LivingEntity le && le.isBlocking();
-    }
-    /** mc.hitResult is already computed against the player's entity interaction range. */
+    @Override public boolean targetHasShieldRaised() { EntityHitResult e = entityHit(); return e != null && e.getEntity() instanceof LivingEntity le && le.isBlocking(); }
     @Override public boolean targetIsInReach() { return entityHit() != null; }
-
     @Override public int selectedHotbarSlot() { return p().getInventory().getSelectedSlot(); }
     @Override public void selectHotbarSlot(int slot) { p().getInventory().setSelectedSlot(slot); }
 
@@ -53,6 +44,10 @@ public final class FabricClientAccess implements ClientAccess {
 
     @Override public void useMainHand() { mc.gameMode.useItem(p(), InteractionHand.MAIN_HAND); }
     @Override public void notifyAction(String message) {
-        if (p() != null) p().sendOverlayMessage(Component.literal("[PvP] " + message));
+        if (p() == null) return;
+        ChatFormatting color = message.endsWith(": ON") ? ChatFormatting.GREEN
+            : message.endsWith(": OFF") ? ChatFormatting.RED : ChatFormatting.YELLOW;
+        Component prefix = Component.literal("[PvP] ").withStyle(ChatFormatting.GRAY);
+        p().sendOverlayMessage(prefix.copy().append(Component.literal(message).withStyle(color)));
     }
 }
